@@ -18,6 +18,10 @@ A personal finance management platform for tracking expenses, monitoring account
 - **Spending Overview**: Visualize your spending patterns with summary views
 - **User Profiles**: Manage profile settings and preferences
 
+## Design
+
+- https://www.figma.com/design/eOK9yvd5c1FYMpAd6mEEFy/finance?m=auto&t=fuGGog7wU2nQXRPH-6
+
 ## Tech Stack
 
 ### Frontend
