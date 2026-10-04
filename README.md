@@ -7,7 +7,7 @@ A personal finance management platform for tracking expenses, monitoring account
 ## Features
 
 - **Secure Authentication**: Email-based sign-up and login via the shared `auth-service`
-- **Expense Tracking**: Log and categorize expenses with a clean, intuitive interface; monthly breakdowns fit the screen width without horizontal scrolling
+- **Expense Tracking**: Log and categorize expenses with a clean, intuitive interface; monthly breakdowns size to their content within the screen width, with alternating light-gray expense groups (including their expanded transactions) and no horizontal scrolling
 - **Bank Statement Parser**: Automatically parse and import expenses from bank statements (PDF, CSV, and text formats)
 - **Custom Parsers**: Create and test custom statement parsers for your specific bank format
 - **Account Management**: Manage multiple accounts and organize expenses by account

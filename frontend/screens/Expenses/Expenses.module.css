@@ -428,7 +428,8 @@
 }
 
 .modal.readMonthDetailModal {
-  width: min(1060px, 100%);
+  width: max-content;
+  max-width: 100%;
   min-width: 0;
   min-height: calc(100vh - 24px);
   max-height: calc(100vh - 24px);
@@ -527,7 +528,7 @@
 
 .readMonthDetailList {
   min-width: 0;
-  gap: 5px;
+  gap: 0;
 }
 
 .readMonthDetailList li {
@@ -565,6 +566,15 @@
   color: inherit;
 }
 
+.readMonthDetailList > li:nth-child(even) {
+  background: #f3f3f3;
+}
+
+.readDetailGroupToggleRow,
+.readDetailGroupRow {
+  padding: 4px 6px;
+}
+
 .readDetailGroupCaret,
 .readDetailGroupCaretPlaceholder {
   width: 12px;
@@ -573,6 +583,8 @@
 }
 
 .readDetailGroupChildRow {
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 10px;
   padding-right: 10px;
 }
