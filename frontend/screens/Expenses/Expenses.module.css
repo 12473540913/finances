@@ -427,19 +427,23 @@
   gap: 8px;
 }
 
-.readMonthDetailModal {
-  width: min(1060px, calc(100vw - 24px));
+.modal.readMonthDetailModal {
+  width: min(1060px, 100%);
+  min-width: 0;
   min-height: calc(100vh - 24px);
   max-height: calc(100vh - 24px);
   overflow: auto;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   padding: 20px;
   gap: 10px;
 }
 
-.readMonthDetailOverlay {
+.modalOverlay.readMonthDetailOverlay {
+  grid-template-columns: minmax(0, 1fr);
   align-items: flex-start;
   overflow-y: auto;
-  padding: 12px 14px;
+  padding: 12px;
 }
 
 .readMonthDetailHeader {
@@ -449,6 +453,7 @@
 
 .readMonthDetailHeaderMain {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   gap: 18px;
@@ -460,6 +465,8 @@
   font-size: 48px;
   font-weight: 400;
   line-height: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .readMonthDetailTotal {
@@ -469,6 +476,7 @@
   line-height: 1;
   text-align: right;
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .readMonthDetailCloseButton {
@@ -488,6 +496,7 @@
 
 .readMonthDetailBody {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   align-content: start;
 }
@@ -498,6 +507,7 @@
 }
 
 .readMonthDetailBody .readAccountHeader {
+  flex-wrap: wrap;
   margin-bottom: 6px;
 }
 
@@ -505,13 +515,18 @@
   font-size: 26px;
   letter-spacing: 0.02em;
   color: #6f6f6f;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .readMonthDetailBody .readAccountTotal {
   font-size: 44px;
+  margin-left: auto;
 }
 
 .readMonthDetailList {
+  min-width: 0;
   gap: 5px;
 }
 
@@ -523,6 +538,11 @@
 .readMonthDetailList .groupAmount {
   font-size: 14px;
   line-height: 1.08;
+}
+
+.readMonthDetailList .groupDescription {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .readDetailGroupToggleRow,
@@ -1362,6 +1382,23 @@ a[role="button"],
 }
 
 @media (max-width: 680px) {
+  .modal.readMonthDetailModal {
+    padding: 16px;
+  }
+
+  .readMonthDetailHeader {
+    padding-right: 52px;
+  }
+
+  .readMonthDetailTitle,
+  .readMonthDetailTotal {
+    font-size: clamp(24px, 6vw, 40px);
+  }
+
+  .readMonthDetailBody .readAccountTotal {
+    font-size: clamp(24px, 6vw, 36px);
+  }
+
   .readMonthGrid {
     grid-template-columns: minmax(0, 1fr);
   }
