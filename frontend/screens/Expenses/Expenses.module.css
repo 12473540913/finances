@@ -565,6 +565,15 @@
   color: inherit;
 }
 
+.readMonthDetailList > li:nth-child(even) {
+  background: #f3f3f3;
+}
+
+.readDetailGroupToggleRow,
+.readDetailGroupRow {
+  padding: 4px 6px;
+}
+
 .readDetailGroupCaret,
 .readDetailGroupCaretPlaceholder {
   width: 12px;
@@ -573,6 +582,8 @@
 }
 
 .readDetailGroupChildRow {
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 10px;
   padding-right: 10px;
 }
