@@ -205,7 +205,7 @@ export function SignUp() {
 
           {step !== "success" && (
             <div className={styles.textLinks}>
-              <Link to="/">Already have an account? Sign In</Link>
+              <p>Already have an account? <Link to="/">Sign in.</Link></p>
             </div>
           )}
         </AuthCard>

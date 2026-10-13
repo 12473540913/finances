@@ -135,7 +135,11 @@
 
 .textLinks a {
   color: var(--ink);
-  text-decoration: none;
+  text-decoration: underline;
+}
+
+.textLinks p {
+  margin: 0;
 }
 
 .inlineForm {

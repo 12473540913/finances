@@ -28,8 +28,27 @@
 .eye {
   width: 13px;
   height: 13px;
-  margin-left: auto;
   flex: none;
+}
+
+.eyeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+.eyeButton:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 3px;
+  border-radius: 50%;
 }
 
 .inputWrap input {

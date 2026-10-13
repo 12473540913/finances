@@ -14,14 +14,16 @@ export function Header({ homeLink = "/", iconVariant = "flag" }: Props) {
       {iconVariant === "profile" ? (
         <Link className={styles.profileTextLink} to="/profile">Profile</Link>
       ) : (
-        <button
-          type="button"
-          className={styles.flagButton}
+        <a
+          className={styles.flagLink}
+          href="https://ncc.lnks.rip"
+          target="_blank"
+          rel="noopener noreferrer"
           aria-label="NCC flag"
-          title="About NCC project page coming soon"
+          title="Visit NCC"
         >
           <img className={styles.flagIcon} src={ASSETS.flag} alt="" aria-hidden="true" />
-        </button>
+        </a>
       )}
     </header>
   );

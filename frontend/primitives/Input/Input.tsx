@@ -42,7 +42,13 @@ export function Input({ type, value, onChange }: Props) {
         />
 
         {type === "password" && (
-          <button type="button" className={styles.eyeButton} onClick={() => setShowPassword((prev) => !prev)}>
+          <button
+            type="button"
+            className={styles.eyeButton}
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+          >
             {showPassword ? (
               <EyeOff className={styles.eye} strokeWidth={1.8} />
             ) : (
