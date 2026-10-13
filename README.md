@@ -4,15 +4,23 @@
 
 A personal finance management platform for tracking expenses, monitoring account balances, organizing financial records, and visualizing financial history.
 
+## Demos
+
+- https://github.com/user-attachments/assets/d5305497-e3a4-4830-b83e-29300ea5460d
+
 ## Features
 
 - **Secure Authentication**: Email-based sign-up and login via the shared `auth-service`
-- **Expense Tracking**: Log and categorize expenses with a clean, intuitive interface; monthly breakdowns size to their content within the screen width, with alternating light-gray expense groups (including their expanded transactions) and no horizontal scrolling
+- **Expense Tracking**: Log and categorize expenses with a clean, intuitive interface; monthly breakdowns fit the screen width without horizontal scrolling
 - **Bank Statement Parser**: Automatically parse and import expenses from bank statements (PDF, CSV, and text formats)
 - **Custom Parsers**: Create and test custom statement parsers for your specific bank format
 - **Account Management**: Manage multiple accounts and organize expenses by account
 - **Spending Overview**: Visualize your spending patterns with summary views
 - **User Profiles**: Manage profile settings and preferences
+
+## Design
+
+- https://www.figma.com/design/eOK9yvd5c1FYMpAd6mEEFy/finance?m=auto&t=fuGGog7wU2nQXRPH-6
 
 ## Tech Stack
 

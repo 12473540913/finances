@@ -428,8 +428,7 @@
 }
 
 .modal.readMonthDetailModal {
-  width: max-content;
-  max-width: 100%;
+  width: min(1060px, 100%);
   min-width: 0;
   min-height: calc(100vh - 24px);
   max-height: calc(100vh - 24px);
@@ -528,7 +527,7 @@
 
 .readMonthDetailList {
   min-width: 0;
-  gap: 0;
+  gap: 5px;
 }
 
 .readMonthDetailList li {
