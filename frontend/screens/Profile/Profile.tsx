@@ -5,6 +5,7 @@ import { ASSETS, authClient } from "../../lib";
 import styles from "./Profile.module.css";
 
 const APP_REPO_URL = "https://github.com/1247350913/finances";
+const NCC_REPO_URL = "https://github.com/12473540913/NCC";
 
 type Metadata = Record<string, any>;
 type ProfileSection = "identity" | "update" | "about";
@@ -18,6 +19,7 @@ export function Profile() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [activeSection, setActiveSection] = useState<ProfileSection>("identity");
+  const [isPhotoExpanded, setIsPhotoExpanded] = useState(false);
 
   const [metadata, setMetadata] = useState<Metadata>({});
   const [email, setEmail] = useState("");
@@ -34,6 +36,17 @@ export function Profile() {
   useEffect(() => {
     void loadProfile();
   }, []);
+
+  useEffect(() => {
+    if (!isPhotoExpanded) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsPhotoExpanded(false);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPhotoExpanded]);
 
   async function loadProfile() {
     try {
@@ -209,9 +222,16 @@ export function Profile() {
           <Link className={styles.subnavLink} to="/overview">Overview</Link>
           <Link className={styles.subnavLink} to="/expenses">Expenses</Link>
           <Link className={styles.subnavLink} to="/entry">Entry</Link>
-          <Link className={styles.profileLink} to="/profile" aria-label="Flag">
+          <a
+            className={styles.profileLink}
+            href="https://ncc.lnks.rip"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="NCC flag"
+            title="Visit NCC"
+          >
             <img className={styles.profileIcon} src={ASSETS.flag} alt="" aria-hidden="true" />
-          </Link>
+          </a>
         </header>
 
         <section className={styles.body}>
@@ -245,12 +265,17 @@ export function Profile() {
               </button>
             </aside>
 
-            <section className={styles.contentCard}>
+            <section className={`${styles.contentCard} ${activeSection === "about" ? styles.contentCardAbout : ""}`}>
               {activeSection === "identity" && (
                 <div className={styles.identityPanel}>
-                  <div className={styles.identityPhotoWrap}>
+                  <button
+                    type="button"
+                    className={styles.identityPhotoWrap}
+                    onClick={() => setIsPhotoExpanded(true)}
+                    aria-label="Expand profile photo"
+                  >
                     <img className={styles.avatarPreview} src={profileImageSrc} alt="Profile" />
-                  </div>
+                  </button>
 
                   <div className={styles.identityInfo}>
                     <div className={styles.infoRow}>
@@ -383,19 +408,59 @@ export function Profile() {
               )}
 
               {activeSection === "about" && (
-                <div className={styles.aboutPanel}>
-                  <h2>About</h2>
-                  <p>Finances is a lightweight personal dashboard for tracking account values and statement-driven expenses.</p>
-                  <p>
-                    Repository: <a href={APP_REPO_URL} target="_blank" rel="noreferrer">{APP_REPO_URL}</a>
-                  </p>
-                  <p>Contact: open an issue in the repository for bugs, feedback, and feature requests.</p>
+                <div className={styles.aboutList}>
+                  <div className={styles.aboutPanel}>
+                    <h2>About finances</h2>
+                    <p>
+                      Finances brings your personal accounts and spending into one place, making it easier to keep an eye on
+                      account values, review expenses, and understand how your spending changes over time. Organize expenses
+                      across multiple accounts, import transactions from bank statements with custom parsers, and explore 
+                      monthly breakdowns and spending summaries to make sense of the details. It is designed to help you keep 
+                      your financial records clear and accessible without getting in the way of how you manage your money.
+                    </p>
+                    <p>
+                      Repository: <a href={APP_REPO_URL} target="_blank" rel="noreferrer">{APP_REPO_URL}</a>
+                    </p>
+                    <p>Contact: open an issue in the repository for bugs, feedback, and feature requests.</p>
+                  </div>
+                  <div className={styles.aboutPanel}>
+                    <h2>About NCC</h2>
+                    <p>See <a href="https://ncc.lnks.rip" target="_blank" rel="noreferrer">website</a> for more details.</p>
+                    <p>
+                      Repository: <a href={NCC_REPO_URL} target="_blank" rel="noreferrer">{NCC_REPO_URL}</a>
+                    </p>
+                    <p>Contact: open an issue in the repository for bugs, feedback, and feature requests.</p>
+                  </div>
                 </div>
+
               )}
             </section>
           </div>
         </section>
       </main>
+
+      {isPhotoExpanded && (
+        <div
+          className={styles.photoLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Profile photo"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setIsPhotoExpanded(false);
+          }}
+        >
+          <button
+            type="button"
+            className={styles.photoLightboxClose}
+            onClick={() => setIsPhotoExpanded(false)}
+            aria-label="Close expanded profile photo"
+            autoFocus
+          >
+            &#215;
+          </button>
+          <img className={styles.expandedPhoto} src={profileImageSrc} alt="Expanded profile" />
+        </div>
+      )}
 
       <Footer />
     </div>

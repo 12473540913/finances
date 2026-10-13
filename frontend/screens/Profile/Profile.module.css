@@ -80,12 +80,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 0;
-  min-height: 0;
+  width: 44px;
+  height: 44px;
   border: 0;
-  background: transparent;
   padding: 0;
   cursor: pointer;
+}
+
+.profileLink:focus-visible {
+  outline: 2px solid #bdbdbd;
+  outline-offset: 2px;
 }
 
 .profileIcon {
@@ -158,6 +162,12 @@
   justify-self: start;
 }
 
+.contentCardAbout {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
 .contentCard h2 {
   margin: 0 0 12px;
   font-family: var(--serif);
@@ -182,11 +192,21 @@
 }
 
 .identityPhotoWrap {
+  display: block;
+  width: 100%;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 14px;
   aspect-ratio: 1 / 1;
   overflow: hidden;
   background: #fafafa;
+  color: inherit;
+  cursor: pointer;
+}
+
+.identityPhotoWrap:focus-visible {
+  outline: 2px solid #777;
+  outline-offset: 3px;
 }
 
 .identityInfo {
@@ -272,20 +292,64 @@
   background: #f0f0f0;
 }
 
+.photoLightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.photoLightboxClose {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  border: 0;
+  padding: 4px;
+  background: transparent;
+  color: #bdbdbd;
+  font-family: var(--sans);
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.photoLightboxClose:focus-visible {
+  outline: 2px solid #bdbdbd;
+  outline-offset: 2px;
+}
+
+.expandedPhoto {
+  display: block;
+  max-width: 92vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
 .aboutPanel {
   display: grid;
-  gap: 10px;
-  justify-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  padding: 18px 22px;
+}
+
+.aboutList {
+  display: grid;
+  gap: 16px;
 }
 
 .aboutPanel p {
-  margin: 0 0 10px;
+  margin: 0;
   font-family: var(--sans);
   font-size: 14px;
   line-height: 1.45;
   width: 100%;
-  max-width: 680px;
-  text-align: center;
+  overflow-wrap: anywhere;
+  text-align: left;
 }
 
 .aboutPanel a {
