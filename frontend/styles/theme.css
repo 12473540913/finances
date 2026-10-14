@@ -1,0 +1,134 @@
+/* ///////////////////////////////////////////////////////////////////
+  //
+  //  THEME TOKENS ---------------------
+  //
+  //  Light is the default theme and reproduces the original palette
+  //  exactly. Dark values are applied automatically from the browser
+  //  or OS preference via prefers-color-scheme.
+  //
+/////////////////////////////////////////////////////////////////// */
+
+:root {
+  color-scheme: light;
+
+  /* Page + surfaces */
+  --page-bg: #f3f3f3;
+  --surface: #fff;
+  --surface-subtle: #fafafa;
+  --surface-raised: #f7f7f7;
+  --surface-muted: #f3f3f3;
+  --surface-active: #efefef;
+  --surface-pressed: #e7e7e7;
+  --surface-stronger: #dedede;
+
+  /* Text */
+  --ink: #111;
+  --text-secondary: #444;
+  --muted: #666;
+  --muted-soft: #888;
+  --text-disabled: #999;
+
+  /* Lines */
+  --border: #e2e2e2;
+  --border-strong: #d8d8d8;
+  --focus-ring: #bdbdbd;
+
+  /* Accent (blue) */
+  --accent: #1b4fd3;
+  --accent-strong: #4f8cff;
+  --accent-border: #98afe6;
+  --accent-bg: #eaf1ff;
+  --accent-bg-strong: #d5e4ff;
+
+  /* Danger (red) */
+  --danger: #b42318;
+  --danger-border: #e0a3a3;
+  --danger-bg: #fdeaea;
+
+  /* Success (green) */
+  --success: #027a48;
+  --success-border: #a3e6b7;
+  --success-bg: #e6f7eb;
+  --success-bg-strong: #d1f2d9;
+
+  /* Warning (amber) */
+  --warning: #7a5c00;
+  --warning-border: #8a6a00;
+
+  /* Elevation + overlays */
+  --shadow-xs: rgba(0, 0, 0, 0.03);
+  --shadow-sm: rgba(0, 0, 0, 0.08);
+  --shadow-md: rgba(0, 0, 0, 0.14);
+  --scrim: rgba(0, 0, 0, 0.26);
+  --scrim-strong: rgba(0, 0, 0, 0.72);
+  /* Sits on top of a dark scrim, so it stays light in both themes. */
+  --on-scrim: #bdbdbd;
+
+  /* Decorative card badge gradient */
+  --badge-gradient-start: #f2f2f2;
+  --badge-gradient-end: #c4c4c4;
+
+  /* Chart axis + gridlines */
+  --chart-grid: #e2e2e2;
+  --chart-axis: #d0d0d0;
+
+  /* Applied to photographic assets that assume a white backdrop */
+  --asset-adjust: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --page-bg: #151518;
+    --surface: #1b1b1e;
+    --surface-subtle: #202024;
+    --surface-raised: #26262b;
+    --surface-muted: #2b2b31;
+    --surface-active: #34343b;
+    --surface-pressed: #3f3f48;
+    --surface-stronger: #3d3d45;
+
+    --ink: #ededf0;
+    --text-secondary: #c9c9d0;
+    --muted: #9a9aa4;
+    --muted-soft: #8b8b95;
+    --text-disabled: #6a6a73;
+
+    --border: #34343b;
+    --border-strong: #45454f;
+    --focus-ring: #8a8a96;
+
+    --accent: #86aaff;
+    --accent-strong: #6f9cff;
+    --accent-border: #3f5a9e;
+    --accent-bg: #1d2740;
+    --accent-bg-strong: #27365a;
+
+    --danger: #ff9b8f;
+    --danger-border: #7a4440;
+    --danger-bg: #2e1d1b;
+
+    --success: #6fd79a;
+    --success-border: #2f6246;
+    --success-bg: #16291f;
+    --success-bg-strong: #1e3a2a;
+
+    --warning: #e0b64f;
+    --warning-border: #7d6420;
+
+    --shadow-xs: rgba(0, 0, 0, 0.5);
+    --shadow-sm: rgba(0, 0, 0, 0.6);
+    --shadow-md: rgba(0, 0, 0, 0.72);
+    --scrim: rgba(0, 0, 0, 0.55);
+    --scrim-strong: rgba(0, 0, 0, 0.8);
+
+    --badge-gradient-start: #3a3a42;
+    --badge-gradient-end: #22222a;
+
+    --chart-grid: #34343b;
+    --chart-axis: #4a4a54;
+
+    --asset-adjust: brightness(0.88) saturate(0.9);
+  }
+}

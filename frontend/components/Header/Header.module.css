@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 clamp(32px, 13vw, 165px);
-  background: #fff;
+  background: var(--surface);
 }
 
 .logo {
@@ -31,10 +31,10 @@
 }
 
 .profileTextLink:hover {
-  background: #f2f2f2;
-  border-color: #ececec;
+  background: var(--surface-muted);
+  border-color: var(--border);
   transform: translateY(-1px);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 0 var(--shadow-xs);
 }
 
 .profileTextLink:active {
@@ -43,7 +43,7 @@
 }
 
 .profileTextLink:focus-visible {
-  outline: 2px solid #bdbdbd;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -67,4 +67,11 @@
   height: 22px;
   display: block;
   object-fit: contain;
+}
+
+/* The flag artwork has a near-black field, so give it an edge on dark backgrounds. */
+@media (prefers-color-scheme: dark) {
+  .flagIcon {
+    box-shadow: 0 0 0 1px var(--border-strong);
+  }
 }
