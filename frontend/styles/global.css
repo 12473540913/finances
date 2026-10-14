@@ -1,10 +1,6 @@
 :root {
   --serif: "Times New Roman", Times, serif;
   --sans: Arial, Helvetica, sans-serif;
-  --ink: #111;
-  --muted: #666;
-  --border: #e2e2e2;
-  --border-strong: #d8d8d8;
 }
 
 * {
@@ -19,7 +15,7 @@ body,
 }
 
 body {
-  background: #f3f3f3;
+  background: var(--page-bg);
   color: var(--ink);
 }
 

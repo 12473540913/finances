@@ -11,8 +11,8 @@
   align-items: center;
   justify-content: center;
 
-  background: #f8f8f8;
-  color: #444;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
 
   font-family: var(--sans);
   font-size: 13px;
@@ -27,15 +27,15 @@
 }
 
 .button:hover:not(:disabled) {
-  background: #efefef;
+  background: var(--surface-active);
 }
 
 .button:active:not(:disabled) {
-  background: #e7e7e7;
+  background: var(--surface-pressed);
 }
 
 .button:disabled {
-  background: #f3f3f3;
-  color: #aaa;
+  background: var(--surface-muted);
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
