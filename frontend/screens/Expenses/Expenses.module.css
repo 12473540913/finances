@@ -566,7 +566,7 @@
 }
 
 .readMonthDetailList > li:nth-child(even) {
-  background: var(--surface-muted);
+  background: #f3f3f3;
 }
 
 .readDetailGroupToggleRow,
