@@ -4,7 +4,7 @@
 	min-width: 0;
 	min-height: 100vh;
 	margin: 0;
-	background: #fff;
+	background: var(--surface);
 	display: grid;
 	grid-template-rows: auto 1fr auto;
 	overflow-x: hidden;
@@ -20,7 +20,7 @@
 	align-items: center;
 	justify-items: center;
 	padding: 0 24px;
-	background: #fff;
+	background: var(--surface);
 }
 
 .subnav a {
@@ -42,10 +42,10 @@
 .backLink:hover,
 .subnavLink:hover,
 .profileLink:hover {
-	background: #f2f2f2;
-	border-color: #ececec;
+	background: var(--surface-muted);
+	border-color: var(--border);
 	transform: translateY(-1px);
-	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.03);
+	box-shadow: 0 2px 0 var(--shadow-xs);
 }
 
 .backLink:active,
@@ -58,7 +58,7 @@
 .backLink:focus-visible,
 .subnavLink:focus-visible,
 .profileLink:focus-visible {
-	outline: 2px solid #bdbdbd;
+	outline: 2px solid var(--focus-ring);
 	outline-offset: 2px;
 }
 
@@ -132,14 +132,14 @@
 	font-family: var(--sans);
 	font-size: 13px;
 	color: var(--ink);
-	background: #fff;
+	background: var(--surface);
 }
 
 .toolbarActions button,
 .groupActions button,
 .accountCell button {
 	border: 1px solid var(--border-strong);
-	background: #f7f7f7;
+	background: var(--surface-raised);
 	border-radius: 999px;
 	padding: 8px 14px;
 	font-family: var(--sans);
@@ -175,7 +175,7 @@
 }
 
 .entryTable th {
-	background: #f4f4f4;
+	background: var(--surface-muted);
 	text-align: center;
 	font-weight: 600;
 }
@@ -197,7 +197,7 @@
 }
 
 .groupRow td {
-	background: #fff;
+	background: var(--surface);
 }
 
 .groupEditor {
@@ -218,7 +218,7 @@
 	font-weight: 800;
 	text-align: left;
 	padding-left: 10px;
-	background: #fff;
+	background: var(--surface);
 	font-size: 15px;
 }
 
@@ -228,7 +228,7 @@
 	color: var(--muted);
 	font-family: var(--sans);
 	font-weight: 400 !important;
-	background: #fff;
+	background: var(--surface);
 }
 
 .groupName,
@@ -251,7 +251,7 @@
 	border: 1px solid var(--border-strong);
 	border-radius: 6px;
 	padding: 6px 8px;
-	background: #fff;
+	background: var(--surface);
 }
 
 .groupEditor input {
@@ -282,7 +282,7 @@
 .dragHandle {
 	border: 1px solid var(--border-strong);
 	border-radius: 6px;
-	background: #fff;
+	background: var(--surface);
 	color: var(--muted);
 	font-family: var(--sans);
 	font-size: 12px;
@@ -407,15 +407,15 @@
 
 .conversionInput {
 	font-size: 12px;
-	color: #555;
-	background: #fafafa;
+	color: var(--muted);
+	background: var(--surface-subtle);
 	border-style: dashed;
 }
 
 .conversionInput:focus {
-	background: #fff;
+	background: var(--surface);
 	border-style: solid;
-	border-color: #4f8cff;
+	border-color: var(--accent-strong);
 	color: var(--ink);
 }
 
@@ -433,7 +433,7 @@
 	font-size: 11px;
 	border-radius: 999px;
 	border: 1px dashed var(--border-strong);
-	background: #f7f7f7;
+	background: var(--surface-raised);
 	color: var(--muted);
 	font-weight: 700;
 }
@@ -443,12 +443,14 @@
 	width: 14px;
 	height: 14px;
 	object-fit: contain;
+	/* Clips the asset's white corners so it reads as a coin on any backdrop. */
+	border-radius: 50%;
 }
 
 .coinToggleActive {
 	border-style: solid;
-	background: #eaf1ff;
-	color: #1b4fd3;
+	background: var(--accent-bg);
+	color: var(--accent);
 	font-weight: 700;
 }
 
@@ -458,16 +460,16 @@
 	font-size: 11px;
 	border-radius: 999px;
 	border: 1px dashed var(--border-strong);
-	background: #f7f7f7;
+	background: var(--surface-raised);
 	color: var(--muted);
 	font-weight: 700;
 }
 
 .debtToggleActive {
 	border-style: solid;
-	border-color: #e0a3a3;
-	background: #fdeaea;
-	color: #b91c1c;
+	border-color: var(--danger-border);
+	background: var(--danger-bg);
+	color: var(--danger);
 	font-weight: 700;
 }
 
@@ -484,8 +486,8 @@
 	line-height: 1;
 	border-radius: 999px;
 	border: 1px solid var(--border-strong);
-	background: #eaf1ff;
-	color: #1b4fd3;
+	background: var(--accent-bg);
+	color: var(--accent);
 	flex-shrink: 0;
 	margin-left: auto;
 	user-select: none;
@@ -503,9 +505,9 @@
 	font-weight: 700;
 	line-height: 1;
 	border-radius: 999px;
-	border: 1px solid #c7d7fc;
-	background: #eaf1ff;
-	color: #1b4fd3;
+	border: 1px solid var(--accent-border);
+	background: var(--accent-bg);
+	color: var(--accent);
 	flex-shrink: 0;
 	margin-left: auto;
 	cursor: pointer;
@@ -514,19 +516,19 @@
 }
 
 .coinBadgeButton:hover {
-	background: #d5e4ff;
-	border-color: #9bbdfb;
+	background: var(--accent-bg-strong);
+	border-color: var(--accent-border);
 }
 
 .coinBadgeButtonUsd {
-	background: #e6f7eb;
-	border-color: #a3e6b7;
-	color: #0b7a36;
+	background: var(--success-bg);
+	border-color: var(--success-border);
+	color: var(--success);
 }
 
 .coinBadgeButtonUsd:hover {
-	background: #d1f2d9;
-	border-color: #79d796;
+	background: var(--success-bg-strong);
+	border-color: var(--success-border);
 }
 
 .coinPicker {
@@ -537,8 +539,8 @@
 	width: 180px;
 	border: 1px solid var(--border-strong);
 	border-radius: 10px;
-	background: #fff;
-	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+	background: var(--surface);
+	box-shadow: 0 10px 24px var(--shadow-md);
 	padding: 8px;
 }
 
@@ -564,7 +566,7 @@
 .coinOption,
 .coinOptionClear {
 	border: 1px solid var(--border);
-	background: #fff;
+	background: var(--surface);
 	border-radius: 6px;
 	padding: 6px 8px;
 	font-family: var(--sans);
@@ -575,7 +577,7 @@
 
 .coinOption:hover,
 .coinOptionClear:hover {
-	background: #f5f8ff;
+	background: var(--accent-bg);
 }
 
 .coinOptionClear {
@@ -597,7 +599,7 @@
 }
 
 .dropTarget {
-	outline: 2px solid #4f8cff;
+	outline: 2px solid var(--accent-strong);
 	outline-offset: -2px;
 }
 
@@ -606,7 +608,7 @@
 	text-align: right;
 	font-family: var(--sans);
 	font-size: 13px;
-	color: #444;
+	color: var(--text-secondary);
 	min-height: 24px;
 	line-height: 24px;
 }
@@ -636,11 +638,11 @@
 }
 
 .errorMessage {
-	color: #b42318;
+	color: var(--danger);
 }
 
 .statusMessage {
-	color: #027a48;
+	color: var(--success);
 }
 
 @media (max-width: 1000px) {
