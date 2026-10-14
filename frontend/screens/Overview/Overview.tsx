@@ -6,7 +6,7 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import { Link } from "react-router-dom";
 import { Footer } from "../../components/Footer";
-import { ASSETS, apiUrl, authClient } from "../../lib";
+import { ASSETS, apiUrl } from "../../lib";
 import styles from "./Overview.module.css";
 
 const markdownSchema = {
@@ -388,9 +388,7 @@ export function Overview() {
       values = (payload?.data?.values ?? []) as EntryValueRow[];
       settingsRow = (payload?.data?.settings ?? undefined) as Record<string, any> | undefined;
 
-      // birth_date now lives with auth-service, not finances-api's own overview payload.
-      const session = await authClient.getSession();
-      birthDateValue = session?.birthDate ?? null;
+      birthDateValue = payload?.data?.birthDate ?? null;
 
       setBirthday(parseBirthday(birthDateValue));
       const startYear = typeof settingsRow?.start_year === "number" ? settingsRow.start_year : null;

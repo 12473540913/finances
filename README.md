@@ -16,7 +16,7 @@ A personal finance management platform for tracking expenses, monitoring account
 - **Custom Parsers**: Create and test custom statement parsers for your specific bank format
 - **Account Management**: Manage multiple accounts and organize expenses by account
 - **Spending Overview**: Visualize your spending patterns with summary views
-- **User Profiles**: Manage profile settings and preferences
+- **User Profiles**: Manage profile settings and preferences; uploaded profile images retain their original bytes, format, and resolution (up to 15 MB), with a square thumbnail and a viewport-fitted full-resolution preview
 
 ## Design
 
@@ -139,9 +139,31 @@ Authentication is delegated to the standalone `auth-service`:
 - Users sign up or log in with email
 - OTP verification via email
 - HttpOnly JWT session cookie
-- User/profile data stored in this app's Neon database via auth-service's `NEON_URI_FINANCES` connection
+- Authentication records stored in this app's Neon database via auth-service's `NEON_URI_FINANCES` connection; app profile details are managed separately by finances
 
 See [frontend/screens/Auth/](frontend/screens/Auth/) for the authentication screens.
+
+### App-Specific Profiles
+
+Apply `database/migrations/2-add_app_profiles.sql` before deploying this version.
+Username, display name, birthday, and profile image are stored by the finances
+backend in `app_profiles` using `GET`/`PUT /api/profile`. Profile details are never
+sent to or loaded from auth-service's profile endpoint. Auth-service handles sign-up,
+sign-in, verification, sessions, sign-out, passwords, and account deletion only.
+Sign-up collects email and password; set an optional username in Profile after
+signing in. Usernames are app-local labels, not login credentials or globally unique
+auth identities. Reads and writes require the user's session cookie, and account
+deletion cascades to the app profile. Original raster
+images up to 15 MB are stored without resizing or re-encoding; larger files are
+rejected explicitly rather than silently compressed. HTTP(S) image URLs are also
+supported. Base64 transport increases stored/request size but does not change the
+image bytes. The existing 25 MB API request limit accommodates the upload limit.
+
+The migration copies existing username, birthday, and photo values from the legacy
+users table once, without overwriting existing app profiles on subsequent runs.
+Previously compressed uploads cannot be restored automatically: re-upload the
+original and save the profile. The small square thumbnail remains cropped for
+layout, while clicking it displays the uncropped original fitted to the viewport.
 
 ## Expense Management
 

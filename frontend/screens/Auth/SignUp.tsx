@@ -12,7 +12,6 @@ type Step = "signup" | "verify" | "success";
 export function SignUp() {
   const [step, setStep] = useState<Step>("signup");
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,14 +19,9 @@ export function SignUp() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const emailTrimmed = email.trim();
-  const usernameTrimmed = username.trim();
   const verificationCodeTrimmed = verificationCode.trim();
 
   const emailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed), [emailTrimmed]);
-
-  const usernameLengthValid = usernameTrimmed.length === 0 || (usernameTrimmed.length >= 3 && usernameTrimmed.length <= 24);
-  const usernameCharactersValid = usernameTrimmed.length === 0 || /^[a-zA-Z0-9_]+$/.test(usernameTrimmed);
-  const usernameValid = usernameLengthValid && usernameCharactersValid;
 
   const passwordLengthValid = password.length >= 8;
   const passwordLowercaseValid = /[a-z]/.test(password);
@@ -43,7 +37,7 @@ export function SignUp() {
 
   const verificationCodeValid = /^[a-zA-Z0-9]{6,8}$/.test(verificationCodeTrimmed);
 
-  const formValid = emailValid && passwordValid && usernameValid && !loading;
+  const formValid = emailValid && passwordValid && !loading;
   const verifyValid = verificationCodeValid && !loading;
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
@@ -56,7 +50,7 @@ export function SignUp() {
       setErrorMessage(null);
       setSuccessMessage(null);
 
-      const result = await authClient.signUp(emailTrimmed, usernameTrimmed, password);
+      const result = await authClient.signUp(emailTrimmed, password);
 
       setStep("verify");
       if (result?.verificationCode) {
@@ -136,15 +130,7 @@ export function SignUp() {
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
               {email.length > 0 && !emailValid && <p className={styles.requirements}>Enter a valid email address.</p>}
 
-              <p className={styles.label}>username</p> 
-              <Input type="username" value={username} onChange={(e) => setUsername(e.target.value)} />
-              {username.length > 0 && (!usernameLengthValid || !usernameCharactersValid) && (
-                <ul className={styles.requirements}>
-                  {!usernameLengthValid && <li>Username must be 3–24 characters.</li>}
-                  {!usernameCharactersValid && <li>Username can only use letters, numbers, and underscores.</li>}
-                </ul>
-              )}
-
+              <p className={styles.requirements}>You can set your username and other profile details after signing in.</p>
               <p className={styles.label}>password <span className={styles.required}>*</span></p>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
               {password.length > 0 && (!passwordLengthValid || !passwordLowercaseValid || !passwordUppercaseValid || !passwordNumberValid || !passwordSpecialCharacterValid) && (

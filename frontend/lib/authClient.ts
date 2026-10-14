@@ -7,10 +7,7 @@ export type AppAuthSession = {
   authenticated: true;
   userId: string;
   email: string;
-  username: string | null;
   emailVerified: boolean;
-  birthDate?: string | null;
-  profilePhotoUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -121,10 +118,10 @@ export const authClient = {
     notifyAuthChanged();
   },
 
-  async signUp(email: string, username: string, password: string): Promise<SignUpResult> {
+  async signUp(email: string, password: string): Promise<SignUpResult> {
     const payload = await fetchAuth("/signup", {
       method: "POST",
-      body: JSON.stringify({ email, username, password }),
+      body: JSON.stringify({ email, password }),
     });
     return {
       verificationCode:
@@ -176,15 +173,6 @@ export const authClient = {
     }
   },
 
-  async updateProfile(patch: { username?: string; birthDate?: string | null; profilePhotoUrl?: string | null }): Promise<AppAuthSession> {
-    const payload = await fetchAuth("/profile", {
-      method: "PATCH",
-      body: JSON.stringify(patch),
-    });
-    notifyAuthChanged();
-    return payload.session as AppAuthSession;
-  },
-
   async changePassword(password: string): Promise<void> {
     await fetchAuth("/account/password", {
       method: "PATCH",
@@ -198,5 +186,4 @@ export const authClient = {
     notifyAuthChanged();
   },
 };
-
 
