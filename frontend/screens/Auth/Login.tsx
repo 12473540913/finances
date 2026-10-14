@@ -62,7 +62,7 @@ export function Login() {
 
           <div className={styles.textLinks}>
             <p>Don’t have an account? <Link to="/signup">Sign up here.</Link></p>
-            <Link to="/forgot">Forgot your username or password?</Link>
+            <Link to="/forgot">Forgot your password?</Link>
           </div>
         </AuthCard>
       </div>

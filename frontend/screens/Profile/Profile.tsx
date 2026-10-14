@@ -2,12 +2,12 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Footer } from "../../components/Footer";
 import { ASSETS, authClient } from "../../lib";
+import { loadAppProfile, readOriginalProfilePhoto, saveAppProfile } from "../../lib/profile";
 import styles from "./Profile.module.css";
 
 const APP_REPO_URL = "https://github.com/1247350913/finances";
 const NCC_REPO_URL = "https://github.com/12473540913/NCC";
 
-type Metadata = Record<string, any>;
 type ProfileSection = "identity" | "update" | "about";
 
 export function Profile() {
@@ -15,13 +15,13 @@ export function Profile() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileSaving, setIsProfileSaving] = useState(false);
+  const [isPhotoReading, setIsPhotoReading] = useState(false);
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [activeSection, setActiveSection] = useState<ProfileSection>("identity");
   const [isPhotoExpanded, setIsPhotoExpanded] = useState(false);
 
-  const [metadata, setMetadata] = useState<Metadata>({});
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -56,39 +56,18 @@ export function Profile() {
 
       const session = await authClient.getSession();
       if (!session) throw new Error("Please sign in again.");
-
-      const nextMetadata: Metadata = {
-        username: session.username ?? "",
-        display_name: "",
-        birth_date: session.birthDate ?? "",
-        profile_photo_url: session.profilePhotoUrl ?? "",
-      };
-
-      setMetadata(nextMetadata);
+      const profile = await loadAppProfile();
       setEmail(session.email ?? "");
-      setUsername(session.username ?? "");
-      setDisplayName("");
-      setBirthday(session.birthDate ?? "");
-      setPhotoUrl(session.profilePhotoUrl ?? "");
+      setUsername(profile.username ?? "");
+      setDisplayName(profile.displayName ?? "");
+      setBirthday(profile.birthDate ?? "");
+      setPhotoUrl(profile.profilePhotoUrl ?? "");
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err.message ?? "Could not load profile.");
     } finally {
       setIsLoading(false);
     }
-  }
-
-  async function saveMetadata(patch: Metadata, successText: string) {
-    const merged = { ...metadata, ...patch };
-
-    await authClient.updateProfile({
-      username: String(merged.username ?? ""),
-      birthDate: String(merged.birth_date ?? "") || null,
-      profilePhotoUrl: String(merged.profile_photo_url ?? "") || null,
-    });
-
-    setMetadata(merged);
-    setStatusMessage(successText);
   }
 
   async function handleProfileSave(event: FormEvent<HTMLFormElement>) {
@@ -98,15 +77,13 @@ export function Profile() {
       setIsProfileSaving(true);
       setErrorMessage(null);
       setStatusMessage(null);
-      await saveMetadata(
-        {
-          username: username.trim(),
-          display_name: displayName.trim(),
-          birth_date: birthday.trim(),
-          profile_photo_url: photoUrl.trim(),
-        },
-        "Profile updated."
-      );
+      await saveAppProfile({
+        username: username.trim() || null,
+        displayName: displayName.trim() || null,
+        birthDate: birthday.trim() || null,
+        profilePhotoUrl: photoUrl.trim() || null,
+      });
+      setStatusMessage("Profile updated.");
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err.message ?? "Could not update profile.");
@@ -118,17 +95,16 @@ export function Profile() {
   async function handlePhotoUpload(file: File | null) {
     if (!file) return;
     try {
+      setIsPhotoReading(true);
       setErrorMessage(null);
-      // Raw uploads (e.g. phone camera or AI-generated images) can be several MB as a data
-      // URL, well past what the auth API accepts, so always downscale before storing it.
-      const dataUrl = await resizeImageToDataUrl(file);
-      if (dataUrl.length > MAX_PHOTO_DATA_URL_LENGTH) {
-        throw new Error("That image is too large even after resizing. Try a smaller photo.");
-      }
+      setStatusMessage(null);
+      const dataUrl = await readOriginalProfilePhoto(file);
       setPhotoUrl(dataUrl);
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err.message ?? "Could not read profile photo file.");
+    } finally {
+      setIsPhotoReading(false);
     }
   }
 
@@ -335,8 +311,9 @@ export function Profile() {
                     <label>
                       Profile Image URL
                       <input
-                        type="url"
+                        type="text"
                         value={photoUrl}
+                        disabled={isPhotoReading || isProfileSaving || isLoading}
                         onChange={(event) => setPhotoUrl(event.target.value)}
                         placeholder="https://..."
                       />
@@ -346,12 +323,17 @@ export function Profile() {
                       Upload Profile Image
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp,image/x-icon,image/vnd.microsoft.icon"
+                        disabled={isPhotoReading || isProfileSaving || isLoading}
                         onChange={(event) => void handlePhotoUpload(event.target.files?.[0] ?? null)}
                       />
                     </label>
+                    <p className={styles.photoHint}>
+                      Originals are preserved without resizing or compression (up to 15 MB).
+                      {isPhotoReading && " Reading image..."}
+                    </p>
 
-                    <button type="submit" disabled={isProfileSaving || isLoading}>
+                    <button type="submit" disabled={isProfileSaving || isPhotoReading || isLoading}>
                       {isProfileSaving ? "Saving..." : "Save Profile Updates"}
                     </button>
                   </form>
@@ -465,50 +447,4 @@ export function Profile() {
       <Footer />
     </div>
   );
-}
-
-async function readFileAsDataUrl(file: File) {
-  return await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== "string") {
-        reject(new Error("Could not read file."));
-        return;
-      }
-      resolve(result);
-    };
-    reader.onerror = () => reject(reader.error ?? new Error("Could not read file."));
-    reader.readAsDataURL(file);
-  });
-}
-
-// Keep in sync with auth-service's PATCH /profile cap on profilePhotoUrl.
-const MAX_PHOTO_DATA_URL_LENGTH = 700_000;
-const MAX_PHOTO_DIMENSION = 256;
-
-// Downscales to a small square-ish JPEG so a multi-MB camera/AI-generated photo doesn't
-// blow past the API's body size limit.
-async function resizeImageToDataUrl(file: File): Promise<string> {
-  const rawDataUrl = await readFileAsDataUrl(file);
-
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Could not decode image file."));
-    img.src = rawDataUrl;
-  });
-
-  const scale = Math.min(1, MAX_PHOTO_DIMENSION / Math.max(image.width, image.height));
-  const width = Math.max(1, Math.round(image.width * scale));
-  const height = Math.max(1, Math.round(image.height * scale));
-
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Could not process image file.");
-  ctx.drawImage(image, 0, 0, width, height);
-
-  return canvas.toDataURL("image/jpeg", 0.8);
 }

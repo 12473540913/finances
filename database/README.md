@@ -44,3 +44,11 @@ Vite uses `.env.development` for `pnpm dev` and production env variables for pro
   migration idempotent (`add column if not exists`, etc.) so re-running is safe.
 
 Avoid destructive statements in production unless intentionally performing maintenance.
+
+## App profiles
+
+Migration `2-add_app_profiles.sql` creates finances-owned profile storage and copies
+legacy username, birthday, and image values once from `users`. Apply it before
+deploying the app-profile API. Future profile updates write only `app_profiles`;
+auth-service continues managing authentication records in `users`. The profile row
+is removed by its foreign-key cascade when an account is deleted.

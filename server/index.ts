@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { db } from "./lib/db";
 import { authCookieName, verifyAuthToken } from "./lib/authVerify";
+import { validateProfile, type AppProfile } from "../shared/profile";
 
 loadEnv({ path: ".env.development" });
 loadEnv();
@@ -92,6 +93,63 @@ async function getAuthenticatedUserFromCookie(req: express.Request): Promise<Aut
   }
 }
 
+app.get("/api/profile", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    const user = await getAuthenticatedUserFromCookie(req);
+    if (!user) {
+      res.status(401).json({ ok: false, error: "Unauthorized" });
+      return;
+    }
+
+    const result = await db.query<AppProfile>(
+      `select username, display_name as "displayName",
+              to_char(birth_date, 'YYYY-MM-DD') as "birthDate",
+              profile_photo_url as "profilePhotoUrl"
+       from public.app_profiles where user_id = $1`,
+      [user.id]
+    );
+    res.json({ ok: true, profile: result.rows[0] ?? {
+      username: null, displayName: null, birthDate: null, profilePhotoUrl: null,
+    } });
+  } catch (error) {
+    console.error("Could not load profile:", error);
+    res.status(500).json({ ok: false, error: "Could not load profile." });
+  }
+});
+
+app.put("/api/profile", async (req, res) => {
+  try {
+    const user = await getAuthenticatedUserFromCookie(req);
+    if (!user) {
+      res.status(401).json({ ok: false, error: "Unauthorized" });
+      return;
+    }
+
+    const profile: unknown = req.body;
+    try {
+      validateProfile(profile);
+    } catch (error) {
+      res.status(400).json({ ok: false, error: error instanceof Error ? error.message : "Invalid profile." });
+      return;
+    }
+
+    await db.query(
+      `insert into public.app_profiles (user_id, username, display_name, birth_date, profile_photo_url)
+       values ($1, $2, $3, $4, $5)
+       on conflict (user_id) do update set
+         username = excluded.username, display_name = excluded.display_name,
+         birth_date = excluded.birth_date, profile_photo_url = excluded.profile_photo_url,
+         updated_at = now()`,
+      [user.id, profile.username, profile.displayName, profile.birthDate, profile.profilePhotoUrl]
+    );
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Could not save profile:", error);
+    res.status(500).json({ ok: false, error: "Could not save profile." });
+  }
+});
+
 app.get("/api/overview", async (req, res) => {
   try {
     const user = await getAuthenticatedUserFromCookie(req);
@@ -100,12 +158,16 @@ app.get("/api/overview", async (req, res) => {
       return;
     }
 
-    const [groupsResult, accountsResult, valuesResult, settingsResult] = await Promise.all([
+    const [groupsResult, accountsResult, valuesResult, settingsResult, profileResult] = await Promise.all([
       db.query("select id, name from public.entry_groups where user_id = $1 order by position asc", [user.id]),
       db.query("select id, group_id, name, coin_symbol, is_debt from public.entry_accounts where user_id = $1 order by position asc", [user.id]),
       db.query("select account_id, year, value, conversion_rate from public.entry_account_values where user_id = $1 order by year asc", [user.id]),
       db.query(
         "select start_year, end_year, overview_widgets, overview_chart_settings, overview_caption_md from public.entry_settings where user_id = $1 limit 1",
+        [user.id]
+      ),
+      db.query<{ birth_date: string | null }>(
+        "select to_char(birth_date, 'YYYY-MM-DD') as birth_date from public.app_profiles where user_id = $1",
         [user.id]
       ),
     ]);
@@ -117,6 +179,7 @@ app.get("/api/overview", async (req, res) => {
         accounts: accountsResult.rows,
         values: valuesResult.rows,
         settings: settingsResult.rows[0] ?? null,
+        birthDate: profileResult.rows[0]?.birth_date ?? null,
       },
     });
   } catch (error: any) {
@@ -788,6 +851,6 @@ async function runCustomPythonParser(parserSource: string, statementText: string
   }
 }
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
