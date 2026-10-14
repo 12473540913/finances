@@ -335,42 +335,6 @@
   object-fit: contain;
 }
 
-.photoLightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.72);
-}
-
-.photoLightboxClose {
-  position: fixed;
-  top: 16px;
-  right: 20px;
-  border: 0;
-  padding: 4px;
-  background: transparent;
-  color: #bdbdbd;
-  font-family: var(--sans);
-  font-size: 36px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.photoLightboxClose:focus-visible {
-  outline: 2px solid #bdbdbd;
-  outline-offset: 2px;
-}
-
-.expandedPhoto {
-  display: block;
-  max-width: 92vw;
-  max-height: 90vh;
-  object-fit: contain;
-}
-
 .aboutPanel {
   display: grid;
   gap: 12px;
