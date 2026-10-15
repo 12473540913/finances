@@ -65,6 +65,7 @@ test("profile API preserves originals, persists app details, and isolates users"
   });
   const load = (session: string) => fetch(`${base}/api/profile`, { headers: { Cookie: session } });
 
+  assert.equal((await (await fetch(`${base}/api/health`)).json()).service, "finances");
   assert.equal((await load("")).status, 401);
   assert.equal((await save(profile, "")).status, 401);
   assert.equal((await save(profile)).status, 200);

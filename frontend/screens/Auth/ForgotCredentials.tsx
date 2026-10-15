@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { ScreenShell } from "../../components/ScreenShell";
 import { AuthCard } from "../../components/AuthCard";
-import { Input }from "../../primitives/Input";
+import { Input } from "../../primitives/Input";
 import { Button } from "../../primitives/Button";
 import { authClient } from "../../lib";
 import styles from "./Auth.module.css";
@@ -43,18 +44,23 @@ export function ForgotCredentials() {
 
   return (
     <ScreenShell>
-      <div className={styles.flowPage}>
-        <h1 className={styles.flowHeading}>First, Enter The Email You Used For<br />Sign Up To Verify Your Account</h1>
-        <AuthCard wide>
-          <form className={styles.formStack} onSubmit={handleSubmit}>
+      <div className={styles.centerPage}>
+        <AuthCard>
+          <h1 className={styles.brandTitle}>finances</h1>
+          <h2 className={styles.smallHeading}>Forgot password</h2>
+          <form className={styles.forgotForm} onSubmit={handleSubmit}>
+            <p className={styles.label}>email</p>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <div className={styles.buttonRow}>
-              <Button type="submit" text={loading ? "Sending..." : "Send Reset Link"} disabled={!formValid} />
+            <div className={styles.forgotButtonRow}>
+              <Button type="submit" text={loading ? "Sending..." : "Send Reset Code"} disabled={!formValid} />
             </div>
           </form>
 
           {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
           {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
+          <div className={styles.textLinks}>
+            <Link to="/">Back to sign in</Link>
+          </div>
         </AuthCard>
       </div>
     </ScreenShell>

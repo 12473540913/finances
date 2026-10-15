@@ -162,7 +162,7 @@
   justify-self: start;
 }
 
-.contentCardAbout {
+.contentCardUnboxed {
   border: 0;
   padding: 0;
   background: transparent;
@@ -245,32 +245,77 @@
   text-align: center;
 }
 
+.updateCard {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  min-width: 0;
+}
+
 .form {
   display: grid;
-  gap: 10px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
+  gap: 16px;
+  padding-top: 12px;
 }
 
 .form h3 {
   text-align: center;
 }
 
-.form label {
+.passwordDialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 24px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+.passwordDialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.passwordDialog .form {
+  padding-top: 0;
+}
+
+.passwordRequirements {
+  margin: -8px 0 0 156px;
+  padding-left: 18px;
+  color: #b42318;
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.form label,
+.photoRow {
   display: grid;
-  gap: 4px;
+  grid-template-columns: 140px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
   font-family: var(--sans);
   font-size: 13px;
   color: #4d4d4d;
 }
 
 .form input {
+  min-width: 0;
+  width: 100%;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: #fff;
   padding: 8px 10px;
   font-size: 14px;
+}
+
+.form input[readonly] {
+  background: #fafafa;
+  color: #666;
 }
 
 .form button {
@@ -292,11 +337,39 @@
   background: #f0f0f0;
 }
 
-.photoHint {
-  margin: 0;
-  color: var(--muted);
-  font-family: var(--sans);
-  font-size: 12px;
+.photoControl {
+  display: flex;
+  align-items: center;
+}
+
+.form .photoButton {
+  background: #f4f4f4;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+.form button,
+.secondaryAction {
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.form button:hover:not(:disabled),
+.secondaryAction:hover:not(:disabled) {
+  background: #ededed;
+  border-color: #bbb;
+}
+
+.form button:focus-visible,
+.secondaryAction:focus-visible {
+  outline: 2px solid #777;
+  outline-offset: 3px;
+}
+
+.form button:disabled,
+.secondaryAction:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .photoLightbox {
@@ -367,24 +440,13 @@
   text-align: center;
 }
 
-.dangerZone {
-  border: 1px solid #e4d4d4;
-  background: #fffafa;
-  border-radius: 12px;
-  padding: 12px;
-  display: grid;
-  gap: 10px;
-}
-
-.dangerActions {
+.accountActions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   justify-content: center;
 }
 
-.secondaryAction,
-.dangerAction {
+.secondaryAction {
   border: 1px solid var(--border);
   border-radius: 999px;
   background: #fff;
@@ -392,11 +454,6 @@
   font-size: 13px;
   padding: 7px 14px;
   cursor: pointer;
-}
-
-.dangerAction {
-  border-color: #dfbcbc;
-  color: #9f2f2f;
 }
 
 .error,
@@ -458,6 +515,32 @@
 @media (max-width: 820px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 540px) {
+    .main {
+      padding-right: 12px;
+      padding-left: 12px;
+    }
+
+    .body {
+      padding-right: 0;
+      padding-left: 0;
+    }
+
+    .updateCard {
+      padding: 16px;
+    }
+
+    .form label,
+    .photoRow {
+      grid-template-columns: 100px minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .passwordRequirements {
+      margin-left: 110px;
+    }
   }
 
   .sideNav {

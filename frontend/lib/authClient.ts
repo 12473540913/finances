@@ -173,10 +173,10 @@ export const authClient = {
     }
   },
 
-  async changePassword(password: string): Promise<void> {
+  async changePassword(currentPassword: string, password: string): Promise<void> {
     await fetchAuth("/account/password", {
       method: "PATCH",
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ currentPassword, password }),
     });
   },
 
@@ -186,4 +186,3 @@ export const authClient = {
     notifyAuthChanged();
   },
 };
-

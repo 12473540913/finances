@@ -49,6 +49,25 @@
   gap: 11px;
 }
 
+.forgotForm {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 24px;
+}
+
+.forgotForm > .label {
+  margin: 0;
+}
+
+.forgotButtonRow {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+}
+
 /* Sign Up */
 
 .signUpStack {
@@ -68,10 +87,6 @@
   grid-column: 1 / -1;
   display: flex;
   justify-content: center;
-}
-
-.required {
-  color: #b42318;
 }
 
 .requirements {
