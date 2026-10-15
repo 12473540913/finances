@@ -1,8 +1,10 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Footer } from "../../components/Footer";
 import { ASSETS, authClient } from "../../lib";
 import { loadAppProfile, readOriginalProfilePhoto, saveAppProfile } from "../../lib/profile";
+import type { AppProfile } from "../../../shared/profile";
+import { getMissingPasswordRequirements } from "../../../shared/password";
 import styles from "./Profile.module.css";
 
 const APP_REPO_URL = "https://github.com/1247350913/finances";
@@ -15,10 +17,14 @@ export function Profile() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileSaving, setIsProfileSaving] = useState(false);
+  const [isProfileSaved, setIsProfileSaved] = useState(false);
   const [isPhotoReading, setIsPhotoReading] = useState(false);
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [isPasswordFormOpen, setIsPasswordFormOpen] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const passwordDialogRef = useRef<HTMLDialogElement>(null);
   const [activeSection, setActiveSection] = useState<ProfileSection>("identity");
   const [isPhotoExpanded, setIsPhotoExpanded] = useState(false);
 
@@ -27,8 +33,12 @@ export function Profile() {
   const [displayName, setDisplayName] = useState("");
   const [birthday, setBirthday] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [savedProfile, setSavedProfile] = useState<AppProfile | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const missingPasswordRequirements = getMissingPasswordRequirements(newPassword);
+  const isNewPasswordValid = missingPasswordRequirements.length === 0;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -36,6 +46,19 @@ export function Profile() {
   useEffect(() => {
     void loadProfile();
   }, []);
+
+  useEffect(() => {
+    if (!isProfileSaved) return;
+    const timeout = window.setTimeout(() => setIsProfileSaved(false), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [isProfileSaved]);
+
+  useEffect(() => {
+    if (!isPasswordFormOpen) return;
+    const dialog = passwordDialogRef.current;
+    dialog?.showModal();
+    return () => dialog?.close();
+  }, [isPasswordFormOpen]);
 
   useEffect(() => {
     if (!isPhotoExpanded) return;
@@ -57,6 +80,7 @@ export function Profile() {
       const session = await authClient.getSession();
       if (!session) throw new Error("Please sign in again.");
       const profile = await loadAppProfile();
+      setSavedProfile(profile);
       setEmail(session.email ?? "");
       setUsername(profile.username ?? "");
       setDisplayName(profile.displayName ?? "");
@@ -70,20 +94,20 @@ export function Profile() {
     }
   }
 
-  async function handleProfileSave(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
+  async function handleProfileSave() {
     try {
       setIsProfileSaving(true);
       setErrorMessage(null);
       setStatusMessage(null);
-      await saveAppProfile({
+      const profile: AppProfile = {
         username: username.trim() || null,
         displayName: displayName.trim() || null,
         birthDate: birthday.trim() || null,
         profilePhotoUrl: photoUrl.trim() || null,
-      });
-      setStatusMessage("Profile updated.");
+      };
+      await saveAppProfile(profile);
+      setSavedProfile(profile);
+      setIsProfileSaved(true);
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err.message ?? "Could not update profile.");
@@ -110,9 +134,16 @@ export function Profile() {
 
   async function handlePasswordSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setErrorMessage(null);
+    setStatusMessage(null);
 
-    if (newPassword.length < 8) {
-      setErrorMessage("New password must be at least 8 characters.");
+    if (!currentPassword) {
+      setErrorMessage("Current password is required.");
+      return;
+    }
+
+    if (!isNewPasswordValid) {
+      setErrorMessage(missingPasswordRequirements.join(" "));
       return;
     }
 
@@ -126,10 +157,12 @@ export function Profile() {
       setErrorMessage(null);
       setStatusMessage(null);
 
-      await authClient.changePassword(newPassword);
+      await authClient.changePassword(currentPassword, newPassword);
 
+      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setIsPasswordFormOpen(false);
       setStatusMessage("Password updated.");
     } catch (err: any) {
       console.error(err);
@@ -137,6 +170,14 @@ export function Profile() {
     } finally {
       setIsPasswordSaving(false);
     }
+  }
+
+  function closePasswordForm() {
+    setIsPasswordFormOpen(false);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setErrorMessage(null);
   }
 
   async function handleSignOut() {
@@ -176,7 +217,6 @@ export function Profile() {
       setStatusMessage(null);
 
       await authClient.deleteAccount();
-
       navigate("/", { replace: true });
     } catch (err: any) {
       console.error(err);
@@ -186,7 +226,7 @@ export function Profile() {
     }
   }
 
-  const profileImageSrc = photoUrl.trim().length > 0 ? photoUrl : ASSETS.defaultProfileIcon;
+  const profileImageSrc = savedProfile?.profilePhotoUrl || ASSETS.defaultProfileIcon;
 
   return (
     <div className={styles.pageShell}>
@@ -213,8 +253,8 @@ export function Profile() {
         <section className={styles.body}>
           {isLoading && <p className={styles.loadingText}>Loading profile...</p>}
 
-          {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-          {statusMessage && <p className={styles.status}>{statusMessage}</p>}
+          {errorMessage && !isPasswordFormOpen && <p className={styles.error} role="alert">{errorMessage}</p>}
+          {statusMessage && <p className={styles.status} role="status">{statusMessage}</p>}
 
           <div className={styles.layout}>
             <aside className={styles.sideNav} aria-label="Profile sections">
@@ -241,7 +281,7 @@ export function Profile() {
               </button>
             </aside>
 
-            <section className={`${styles.contentCard} ${activeSection === "about" ? styles.contentCardAbout : ""}`}>
+            <section className={`${styles.contentCard} ${activeSection !== "identity" ? styles.contentCardUnboxed : ""}`}>
               {activeSection === "identity" && (
                 <div className={styles.identityPanel}>
                   <button
@@ -260,15 +300,15 @@ export function Profile() {
                     </div>
                     <div className={styles.infoRow}>
                       <span>Username</span>
-                      <strong>{username.trim().length > 0 ? username : "-"}</strong>
+                      <strong>{savedProfile?.username || "-"}</strong>
                     </div>
                     <div className={styles.infoRow}>
                       <span>Display Name</span>
-                      <strong>{displayName.trim().length > 0 ? displayName : "-"}</strong>
+                      <strong>{savedProfile?.displayName || "-"}</strong>
                     </div>
                     <div className={styles.infoRow}>
                       <span>Birthday</span>
-                      <strong>{birthday.trim().length > 0 ? birthday : "-"}</strong>
+                      <strong>{savedProfile?.birthDate || "-"}</strong>
                     </div>
                   </div>
                 </div>
@@ -276,116 +316,188 @@ export function Profile() {
 
               {activeSection === "update" && (
                 <div className={styles.updatePanel}>
-                  <h2>Profile Details</h2>
+                  <section className={styles.updateCard} aria-labelledby="profile-details-heading">
+                    <h2 id="profile-details-heading">Profile Details</h2>
+                    <form className={styles.form} onSubmit={(event) => event.preventDefault()}>
+                      <label>
+                        <span>Email</span>
+                        <input type="email" value={email} readOnly autoComplete="email" />
+                      </label>
+                      <label>
+                        <span>Username</span>
+                        <input
+                          type="text"
+                          value={username}
+                          disabled={isLoading || isProfileSaving}
+                          onChange={(event) => setUsername(event.target.value)}
+                          placeholder="Optional"
+                        />
+                      </label>
 
-                  <form className={styles.form} onSubmit={handleProfileSave}>
-                    <label>
-                      Username
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                        placeholder="Optional"
-                      />
-                    </label>
+                      <label>
+                        <span>Display name</span>
+                        <input
+                          type="text"
+                          value={displayName}
+                          disabled={isLoading || isProfileSaving}
+                          onChange={(event) => setDisplayName(event.target.value)}
+                          placeholder="Optional"
+                        />
+                      </label>
 
-                    <label>
-                      Display Name
-                      <input
-                        type="text"
-                        value={displayName}
-                        onChange={(event) => setDisplayName(event.target.value)}
-                        placeholder="Optional"
-                      />
-                    </label>
+                      <label>
+                        <span>Birthday</span>
+                        <input
+                          type="date"
+                          value={birthday}
+                          disabled={isLoading || isProfileSaving}
+                          onChange={(event) => setBirthday(event.target.value)}
+                        />
+                      </label>
 
-                    <label>
-                      Birthday
-                      <input
-                        type="date"
-                        value={birthday}
-                        onChange={(event) => setBirthday(event.target.value)}
-                      />
-                    </label>
+                      <div className={styles.photoRow}>
+                        <span id="profile-image-label">Profile Image</span>
+                        <div className={styles.photoControl}>
+                          <button
+                            type="button"
+                            className={styles.photoButton}
+                            onClick={() => photoInputRef.current?.click()}
+                            disabled={isPhotoReading || isProfileSaving || isLoading}
+                            aria-describedby="profile-image-label"
+                          >
+                            {isPhotoReading ? "Reading image..." : photoUrl.trim() ? "Change photo" : "Choose photo"}
+                          </button>
+                          <input
+                            ref={photoInputRef}
+                            hidden
+                            type="file"
+                            aria-label="Profile Image"
+                            accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp,image/x-icon,image/vnd.microsoft.icon"
+                            disabled={isPhotoReading || isProfileSaving || isLoading}
+                            onChange={(event) => {
+                              void handlePhotoUpload(event.target.files?.[0] ?? null);
+                              event.target.value = "";
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                    <label>
-                      Profile Image URL
-                      <input
-                        type="text"
-                        value={photoUrl}
-                        disabled={isPhotoReading || isProfileSaving || isLoading}
-                        onChange={(event) => setPhotoUrl(event.target.value)}
-                        placeholder="https://..."
-                      />
-                    </label>
+                      <button
+                        type="button"
+                        onClick={() => void handleProfileSave()}
+                        disabled={isProfileSaving || isProfileSaved || isPhotoReading || isLoading}
+                        aria-live="polite"
+                      >
+                        {isProfileSaving ? "Saving..." : isProfileSaved ? "Saved" : "Save Profile Updates"}
+                      </button>
+                    </form>
+                  </section>
 
-                    <label>
-                      Upload Profile Image
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp,image/x-icon,image/vnd.microsoft.icon"
-                        disabled={isPhotoReading || isProfileSaving || isLoading}
-                        onChange={(event) => void handlePhotoUpload(event.target.files?.[0] ?? null)}
-                      />
-                    </label>
-                    <p className={styles.photoHint}>
-                      Originals are preserved without resizing or compression (up to 15 MB).
-                      {isPhotoReading && " Reading image..."}
-                    </p>
-
-                    <button type="submit" disabled={isProfileSaving || isPhotoReading || isLoading}>
-                      {isProfileSaving ? "Saving..." : "Save Profile Updates"}
-                    </button>
-                  </form>
-
-                  <form className={styles.form} onSubmit={handlePasswordSave}>
-                    <h3>Change Password</h3>
-                    <label>
-                      New Password
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(event) => setNewPassword(event.target.value)}
-                        placeholder="At least 8 characters"
-                        minLength={8}
-                      />
-                    </label>
-                    <label>
-                      Confirm Password
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(event) => setConfirmPassword(event.target.value)}
-                        placeholder="Repeat new password"
-                        minLength={8}
-                      />
-                    </label>
-                    <button type="submit" disabled={isPasswordSaving || isLoading}>
-                      {isPasswordSaving ? "Saving..." : "Change Password"}
-                    </button>
-                  </form>
-
-                  <div className={styles.dangerZone}>
-                    <h3>Session & Account</h3>
-                    <div className={styles.dangerActions}>
+                  <section className={styles.updateCard} aria-labelledby="session-account-heading">
+                    <h2 id="session-account-heading">Session &amp; Account</h2>
+                    <div className={styles.accountActions}>
                       <button
                         type="button"
                         className={styles.secondaryAction}
                         onClick={() => void handleSignOut()}
-                        disabled={isSigningOut || isLoading}
+                        disabled={isSigningOut || isPasswordSaving || isLoading}
                       >
                         {isSigningOut ? "Signing out..." : "Sign Out"}
                       </button>
                       <button
                         type="button"
+                        className={styles.secondaryAction}
+                        aria-haspopup="dialog"
+                        onClick={() => {
+                          setIsPasswordFormOpen(true);
+                          setCurrentPassword("");
+                          setNewPassword("");
+                          setConfirmPassword("");
+                          setErrorMessage(null);
+                          setStatusMessage(null);
+                        }}
+                        disabled={isPasswordSaving || isSigningOut || isLoading}
+                      >
+                        Change Password
+                      </button>
+                      <button
+                        type="button"
                         className={styles.dangerAction}
                         onClick={() => void handleDeleteAccount()}
-                        disabled={isLoading || isDeletingAccount}
+                        disabled={isLoading || isDeletingAccount || isSigningOut || isPasswordSaving}
                       >
                         {isDeletingAccount ? "Deleting..." : "Delete Account"}
                       </button>
                     </div>
-                  </div>
+                    {isPasswordFormOpen && (
+                      <dialog
+                        ref={passwordDialogRef}
+                        className={styles.passwordDialog}
+                        aria-labelledby="change-password-heading"
+                        onCancel={(event) => {
+                          event.preventDefault();
+                          if (!isPasswordSaving) closePasswordForm();
+                        }}
+                      >
+                      <form id="change-password-form" className={styles.form} onSubmit={handlePasswordSave} aria-label="Change Password">
+                        <h3 id="change-password-heading">Change Password</h3>
+                        {errorMessage && <p className={styles.error} role="alert">{errorMessage}</p>}
+                        <label>
+                          <span>Current Password</span>
+                          <input
+                            type="password"
+                            value={currentPassword}
+                            onChange={(event) => setCurrentPassword(event.target.value)}
+                            autoComplete="current-password"
+                            required
+                            autoFocus
+                            disabled={isPasswordSaving}
+                          />
+                        </label>
+                        <label>
+                          <span>New Password</span>
+                          <input
+                            type="password"
+                            value={newPassword}
+                            onChange={(event) => setNewPassword(event.target.value)}
+                            placeholder="Enter new password"
+                            aria-describedby={newPassword.length > 0 && !isNewPasswordValid ? "new-password-requirements" : undefined}
+                            autoComplete="new-password"
+                            required
+                            disabled={isPasswordSaving}
+                            minLength={8}
+                          />
+                        </label>
+                        {newPassword.length > 0 && !isNewPasswordValid && (
+                          <ul id="new-password-requirements" className={styles.passwordRequirements}>
+                            {missingPasswordRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}
+                          </ul>
+                        )}
+                        <label>
+                          <span>Confirm Password</span>
+                          <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(event) => setConfirmPassword(event.target.value)}
+                            placeholder="Repeat new password"
+                            autoComplete="new-password"
+                            required
+                            disabled={isPasswordSaving}
+                            minLength={8}
+                          />
+                        </label>
+                        <div className={styles.accountActions}>
+                          <button type="button" onClick={closePasswordForm} disabled={isPasswordSaving}>
+                            Cancel
+                          </button>
+                          <button type="submit" disabled={isPasswordSaving || isLoading || !isNewPasswordValid || !currentPassword || !confirmPassword}>
+                            {isPasswordSaving ? "Saving..." : "Update Password"}
+                          </button>
+                        </div>
+                      </form>
+                      </dialog>
+                    )}
+                  </section>
                 </div>
               )}
 

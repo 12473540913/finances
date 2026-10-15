@@ -1,6 +1,6 @@
 .card {
   width: min(430px, calc(100vw - 42px));
-  min-height: 630px;
+  min-height: 460px;
   box-sizing: border-box;
 
   display: flex;
@@ -11,7 +11,7 @@
 
   border: 1px solid var(--border-strong);
   border-radius: 10px;
-  background: var(--surface);
+  background: #fff;
 }
 
 .wide {

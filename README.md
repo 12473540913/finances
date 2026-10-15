@@ -67,6 +67,16 @@ pnpm dev
 ```
 
 This runs both the client (port 5173) and server concurrently.
+The Finances API defaults to port 3002. Set `PORT` in `.env.development` to change
+it; Vite's `/api` proxy uses the same setting. Leave `VITE_API_BASE_URL` unset for
+local development so API and auth requests use same-origin cookies. Restart
+`pnpm dev` after changing environment settings.
+
+If login succeeds but `/api/profile` returns `401 Unauthorized`, check that the
+API port belongs to Finances, not another local app. Choose an unused `PORT`
+rather than disabling authentication. Also ensure `JWT_SECRET`,
+`AUTH_COOKIE_NAME`, and `DATABASE_URL` match the selected auth-service environment
+(its database setting is `NEON_URI_FINANCES`).
 
 ### Build for Production
 
@@ -164,6 +174,21 @@ users table once, without overwriting existing app profiles on subsequent runs.
 Previously compressed uploads cannot be restored automatically: re-upload the
 original and save the profile. The small square thumbnail remains cropped for
 layout, while clicking it displays the uncropped original fitted to the viewport.
+
+Update Profile has two containers: Profile Details (read-only email, username,
+display name, birthday, and a photo picker) and Session & Account (Sign Out and
+Change Password). Save Profile Updates persists profile edits and the selected
+photo only when that button is activated. Edits and selected photos remain drafts;
+Identity shows the last successfully saved profile, not unsaved edits. A successful
+save briefly fades and disables the save button with the label "Saved" for two
+seconds instead of displaying a page-level success message. Pressing Enter in a
+profile field does not save. Change Password opens a modal form with a Cancel button, requiring the
+current password, a new password, and confirmation; the auth service verifies the
+current password before updating it. Cancel or Escape dismisses the form and
+clears the password fields without submitting.
+The new password uses the same rules as sign-up: at least eight characters,
+including lowercase, uppercase, a number, and a special character. Unmet
+requirements appear in red only after typing begins and disappear as they are met.
 
 ## Expense Management
 

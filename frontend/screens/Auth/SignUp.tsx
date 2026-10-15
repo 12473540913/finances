@@ -5,6 +5,7 @@ import { ScreenShell } from "../../components/ScreenShell";
 import { AuthCard } from "../../components/AuthCard";
 import { Input } from "../../primitives/Input";
 import { Button } from "../../primitives/Button";
+import { getMissingPasswordRequirements } from "../../../shared/password";
 import styles from "./Auth.module.css";
 
 type Step = "signup" | "verify" | "success";
@@ -23,17 +24,8 @@ export function SignUp() {
 
   const emailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed), [emailTrimmed]);
 
-  const passwordLengthValid = password.length >= 8;
-  const passwordLowercaseValid = /[a-z]/.test(password);
-  const passwordUppercaseValid = /[A-Z]/.test(password);
-  const passwordNumberValid = /[0-9]/.test(password);
-  const passwordSpecialCharacterValid = /[^a-zA-Z0-9]/.test(password);
-  const passwordValid =
-    passwordLengthValid &&
-    passwordLowercaseValid &&
-    passwordUppercaseValid &&
-    passwordNumberValid &&
-    passwordSpecialCharacterValid;
+  const missingPasswordRequirements = getMissingPasswordRequirements(password);
+  const passwordValid = missingPasswordRequirements.length === 0;
 
   const verificationCodeValid = /^[a-zA-Z0-9]{6,8}$/.test(verificationCodeTrimmed);
 
@@ -133,13 +125,9 @@ export function SignUp() {
               <p className={styles.requirements}>You can set your username and other profile details after signing in.</p>
               <p className={styles.label}>password <span className={styles.required}>*</span></p>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-              {password.length > 0 && (!passwordLengthValid || !passwordLowercaseValid || !passwordUppercaseValid || !passwordNumberValid || !passwordSpecialCharacterValid) && (
+              {password.length > 0 && !passwordValid && (
                 <ul className={styles.requirements}>
-                  {!passwordLengthValid && <li>Password must be at least 8 characters.</li>}
-                  {!passwordLowercaseValid && <li>Password must include a lowercase letter.</li>}
-                  {!passwordUppercaseValid && <li>Password must include an uppercase letter.</li>}
-                  {!passwordNumberValid && <li>Password must include a number.</li>}
-                  {!passwordSpecialCharacterValid && <li>Password must include a special character.</li>}
+                  {missingPasswordRequirements.map((requirement) => <li key={requirement}>{requirement}</li>)}
                 </ul>
               )}
 

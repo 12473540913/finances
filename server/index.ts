@@ -15,7 +15,7 @@ loadEnv({ path: ".env.development" });
 loadEnv();
 
 const app = express();
-const PORT = Number(process.env.PORT ?? 3001);
+const PORT = Number(process.env.PORT ?? 3002);
 
 // In production, restrict CORS to known frontend origins only.
 // ALLOWED_ORIGINS is a comma-separated list set via Cloud Run env var.
@@ -60,7 +60,7 @@ async function initDb() {
 void initDb();
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, message: "Backend server is running" });
+  res.json({ ok: true, service: "finances", message: "Backend server is running" });
 });
 
 type AuthenticatedUser = {

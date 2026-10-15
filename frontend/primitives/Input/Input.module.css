@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   padding: 0 18px;
-  background: var(--surface);
+  background: #fff;
   box-sizing: border-box;
 }
 

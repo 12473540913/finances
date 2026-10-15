@@ -7,7 +7,7 @@
   font-family: var(--serif);
   font-size: 14px;
   color: var(--ink);
-  background: var(--surface);
+  background: #fff;
 }
 
 .footer a {
@@ -16,7 +16,7 @@
 }
 
 .footer a:focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: 2px solid #bdbdbd;
   outline-offset: 2px;
 }
 

@@ -33,10 +33,10 @@
 }
 
 .homeNav a:hover {
-  background: var(--surface-muted);
-  border-color: var(--border);
+  background: #f2f2f2;
+  border-color: #ececec;
   transform: translateY(-1px);
-  box-shadow: 0 2px 0 var(--shadow-xs);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.03);
 }
 
 .homeNav a:active {
@@ -45,7 +45,7 @@
 }
 
 .homeNav a:focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: 2px solid #bdbdbd;
   outline-offset: 2px;
 }
 

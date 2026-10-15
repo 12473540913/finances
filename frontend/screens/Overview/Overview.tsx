@@ -1150,13 +1150,13 @@ export function Overview() {
                 y1={geometry.valueToY(tick)}
                 x2={geometry.width - geometry.right}
                 y2={geometry.valueToY(tick)}
-                stroke="var(--chart-grid)"
+                stroke="#e2e2e2"
                 strokeWidth="1"
               />
             ))}
 
-            <line x1={geometry.left} y1={geometry.baselineY} x2={geometry.width - geometry.right} y2={geometry.baselineY} stroke="var(--chart-axis)" strokeWidth="1" />
-            <line x1={geometry.left} y1={geometry.top} x2={geometry.left} y2={geometry.baselineY} stroke="var(--chart-axis)" strokeWidth="1" />
+            <line x1={geometry.left} y1={geometry.baselineY} x2={geometry.width - geometry.right} y2={geometry.baselineY} stroke="#d0d0d0" strokeWidth="1" />
+            <line x1={geometry.left} y1={geometry.top} x2={geometry.left} y2={geometry.baselineY} stroke="#d0d0d0" strokeWidth="1" />
 
             {settings.goalValue !== null && geometry.goalY !== null && (
               <line
