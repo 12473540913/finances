@@ -114,15 +114,16 @@ export function SignUp() {
       <div className={styles.centerPage}>
         <AuthCard>
           <h1 className={styles.brandTitle}>finances</h1>
-          <h2 className={styles.smallHeading}>Create Account</h2>
+          <h2 className={styles.smallHeading}>Sign Up</h2>
 
           {step === "signup" && (
             <form className={styles.signUpStack} onSubmit={handleSubmit}>
-              <p className={styles.label}>email</p>
+              <p className={styles.label}>email <span className={styles.required}>*</span></p>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
               {email.length > 0 && !emailValid && <p className={styles.requirements}>Enter a valid email address.</p>}
 
-              <p className={styles.label}>password</p>
+              <p className={styles.requirements}>You can set your username and other profile details after signing in.</p>
+              <p className={styles.label}>password <span className={styles.required}>*</span></p>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
               {password.length > 0 && !passwordValid && (
                 <ul className={styles.requirements}>
@@ -131,14 +132,14 @@ export function SignUp() {
               )}
 
               <div className={styles.buttonRow}>
-                <Button type="submit" text={loading ? "Creating..." : "Sign Up"} disabled={!formValid}/>
+                <Button type="submit" text={loading ? "Creating..." : "Create Account"} disabled={!formValid}/>
               </div>
             </form>
           )}
 
           {step === "verify" && (
             <form className={styles.signUpStack} onSubmit={handleVerify}>
-              <p className={styles.label}>code</p>
+              <p className={styles.label}>code <span className={styles.required}>*</span></p>
               <input
                 className={styles.codeInput}
                 value={verificationCode}
@@ -178,7 +179,7 @@ export function SignUp() {
 
           {step !== "success" && (
             <div className={styles.textLinks}>
-              <p><Link to="/">Back to sign in</Link></p>
+              <p>Already have an account? <Link to="/">Sign in.</Link></p>
             </div>
           )}
         </AuthCard>

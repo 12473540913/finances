@@ -21,6 +21,7 @@ export function Profile() {
   const [isPhotoReading, setIsPhotoReading] = useState(false);
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isPasswordFormOpen, setIsPasswordFormOpen] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const passwordDialogRef = useRef<HTMLDialogElement>(null);
@@ -195,6 +196,33 @@ export function Profile() {
       setErrorMessage(err.message ?? "Could not sign out.");
     } finally {
       setIsSigningOut(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    const shouldContinue = window.confirm(
+      "Delete your account permanently? This cannot be undone."
+    );
+    if (!shouldContinue) return;
+
+    const confirmation = window.prompt("Type DELETE to confirm account deletion.");
+    if (confirmation !== "DELETE") {
+      setErrorMessage("Account deletion cancelled. Type DELETE exactly to confirm.");
+      return;
+    }
+
+    try {
+      setIsDeletingAccount(true);
+      setErrorMessage(null);
+      setStatusMessage(null);
+
+      await authClient.deleteAccount();
+      navigate("/", { replace: true });
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err.message ?? "Could not delete account.");
+    } finally {
+      setIsDeletingAccount(false);
     }
   }
 
@@ -391,6 +419,14 @@ export function Profile() {
                         disabled={isPasswordSaving || isSigningOut || isLoading}
                       >
                         Change Password
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.dangerAction}
+                        onClick={() => void handleDeleteAccount()}
+                        disabled={isLoading || isDeletingAccount || isSigningOut || isPasswordSaving}
+                      >
+                        {isDeletingAccount ? "Deleting..." : "Delete Account"}
                       </button>
                     </div>
                     {isPasswordFormOpen && (

@@ -45,6 +45,24 @@ jobs:
       - name: Build backend container (preflight only)
         run: docker build -t finances-api:pr-check .
 
+      - name: Check backend container health on Cloud Run port
+        run: |
+          trap 'docker logs finances-api-smoke; docker rm -f finances-api-smoke' EXIT
+          docker run -d --name finances-api-smoke \
+            -e NODE_ENV=production \
+            -e PORT=8080 \
+            -e DATABASE_URL=postgresql://localhost:5432/finances \
+            -e JWT_SECRET=container-smoke-test \
+            finances-api:pr-check
+          for attempt in {1..30}; do
+            if docker exec finances-api-smoke node -e \
+              'fetch("http://127.0.0.1:8080/api/health").then(async (res) => { if (!res.ok || (await res.json()).ok !== true) process.exit(1); }).catch(() => process.exit(1));'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+
       - name: Wrangler CLI sanity check
         run: npx --yes wrangler --version
 
@@ -157,4 +175,3 @@ jobs:
             --cpu 1 \
             --timeout 60s \
             --env-vars-file cloudrun-env.yaml
-

@@ -350,7 +350,8 @@
 }
 
 .form button,
-.secondaryAction {
+.secondaryAction,
+.dangerAction {
   transition: background-color 160ms ease, border-color 160ms ease;
 }
 
@@ -360,16 +361,66 @@
   border-color: #bbb;
 }
 
+.dangerAction:hover:not(:disabled) {
+  background: #fff1f0;
+  border-color: #b42318;
+}
+
 .form button:focus-visible,
-.secondaryAction:focus-visible {
+.secondaryAction:focus-visible,
+.dangerAction:focus-visible {
   outline: 2px solid #777;
   outline-offset: 3px;
 }
 
 .form button:disabled,
-.secondaryAction:disabled {
+.secondaryAction:disabled,
+.dangerAction:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.photoLightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.photoLightboxClose {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  border: 0;
+  padding: 4px;
+  background: transparent;
+  color: #bdbdbd;
+  font-family: var(--sans);
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.photoLightboxClose:focus-visible {
+  outline: 2px solid #bdbdbd;
+  outline-offset: 2px;
+}
+
+.expandedPhoto {
+  display: block;
+  max-width: 92vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.photoHint {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 12px;
 }
 
 .photoLightbox {
@@ -450,6 +501,17 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   background: #fff;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.dangerAction {
+  border: 1px solid #b42318;
+  border-radius: 999px;
+  background: #fff;
+  color: #b42318;
   font-family: var(--sans);
   font-size: 13px;
   padding: 7px 14px;

@@ -83,6 +83,10 @@
   margin: 0;
 }
 
+.required {
+  color: #b42318;
+}
+
 .buttonRow {
   grid-column: 1 / -1;
   display: flex;

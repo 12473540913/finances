@@ -13,8 +13,9 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
-# Copy server source and TypeScript config
+# Copy server source, shared runtime modules, and TypeScript config
 COPY server/ ./server/
+COPY shared/ ./shared/
 COPY tsconfig.json ./
 
 EXPOSE 3001
