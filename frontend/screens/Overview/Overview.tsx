@@ -414,8 +414,10 @@ export function Overview() {
       }
 
       const accountNameById = new Map<string, string>();
-      for (const account of accounts) {
+      const accountOrderById = new Map<string, number>();
+      for (const [index, account] of accounts.entries()) {
         accountNameById.set(account.id, account.name);
+        accountOrderById.set(account.id, index);
       }
 
       const nextNetWorthByYear = new Map<number, number>();
@@ -459,7 +461,10 @@ export function Overview() {
       setAccountRowsByGroup(new Map(
         [...nextAccountTotalsByGroup.entries()].map(([groupName, accountsMap]) => [
           groupName,
-          [...accountsMap.values()].sort((a, b) => a.name.localeCompare(b.name)),
+          [...accountsMap.values()].sort(
+            (a, b) => (accountOrderById.get(a.id) ?? Number.MAX_SAFE_INTEGER)
+              - (accountOrderById.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+          ),
         ])
       ));
       const sortedSectionNames = [...new Set([
